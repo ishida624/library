@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use App\User;
+use Illuminate\Http\Request;
 
 class LoginMiddleware
 {
@@ -19,7 +20,8 @@ class LoginMiddleware
         #check token
         $token = $request->header('userToken');
         $data = User::where('remember_token', $token)->first();
-        $level = $data->Lv;
+        $Lv = $data->Lv;
+        $request->merge(['UserData' => $data]);
         // dd($Lv);
         // dd($data->remember_token);
         // dd($tokenTime, date('Y-m-d H:i:s'));

@@ -18,9 +18,11 @@ class LogController extends Controller
      */
     public function index(Request $request)
     {
-        $token = $request->header('userToken');
-        $UserData = User::where('remember_token', $token)->first();
+        $UserData = $request->input('UserData');
+        // $token = $request->header('userToken');
+        // $UserData = User::where('remember_token', $token)->first();
         $Lv = $UserData->Lv;
+        dd($Log);
         if ($Lv < 3) {
             $Log = $UserData->BorrowLog->sortbydesc('borrow_time');
             return $Log;
@@ -78,8 +80,9 @@ class LogController extends Controller
     {
         #book status : true  書還在  ，false 書被借
         #give back  :  true 已還書 ，false 書未還
-        $token = $request->header('userToken');
-        $UserData = User::where('remember_token', $token)->first();
+        // $token = $request->header('userToken');
+        // $UserData = User::where('remember_token', $token)->first();
+        $UserData = $request->input('UserData');
         $NoGiveBack = $UserData->BorrowLog->where('give_back', '0')->count();
         // dd($NoGiveBack);
         $UserId = $UserData->id;
@@ -107,8 +110,9 @@ class LogController extends Controller
     }
     public function returnBook(Request $request)
     {
-        $token = $request->header('userToken');
-        $UserData = User::where('remember_token', $token)->first();
+        // $token = $request->header('userToken');
+        // $UserData = User::where('remember_token', $token)->first();
+        $UserData = $request->input('UserData');
         $BookId = $request->id;
         $BookData = $UserData->BorrowLog->where('book_id', $BookId)->sortbydesc('borrow_time')->first();
         $GiveBack = $BookData->give_back;

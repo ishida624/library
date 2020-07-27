@@ -31,8 +31,10 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
-        $token = $request->header('userToken');
-        $UserLv = User::where('remember_token', $token)->first()->Lv;
+        // $token = $request->header('userToken');
+        // $UserLv = User::where('remember_token', $token)->first()->Lv;
+        $UserData = $request->input('UserData');
+        $UserLv = $UserData->Lv;
         if ($UserLv === 3) {
             $bookname = $request->bookname;
             // dd($bookname);
@@ -68,8 +70,10 @@ class BookController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $token = $request->header('userToken');
-        $UserLv = User::where('remember_token', $token)->first()->Lv;
+        // $token = $request->header('userToken');
+        // $UserLv = User::where('remember_token', $token)->first()->Lv;
+        $UserData = $request->input('UserData');
+        $UserLv = $UserData->Lv;
         if ($UserLv === 3) {
             $update = $request->bookname;
             Book::find($id)->update(['bookname' => $update]);
@@ -89,8 +93,10 @@ class BookController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        $token = $request->header('userToken');
-        $UserLv = User::where('remember_token', $token)->first()->Lv;
+        // $token = $request->header('userToken');
+        $UserData = $request->input('UserData');
+        $UserLv = $UserData->Lv;
+        // $UserLv = User::where('remember_token', $token)->first()->Lv;
         if ($UserLv === 3) {
             $delete = Book::find($id)->delete();
 
