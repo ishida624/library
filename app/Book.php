@@ -11,6 +11,10 @@ class Book extends Model
     public $primaryKey = 'id';
     // public $timestamps = false;
     protected $fillable = [
-         'bookname', 'Borrower','status',
+        'bookname', 'Borrower', 'status',
     ];
+    public function BorrowLog()
+    {
+        return $this->hasMany('App\BorrowLog');
+    }
 }

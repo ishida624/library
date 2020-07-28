@@ -17,9 +17,12 @@ use Illuminate\Support\Facades\Route;
 // Route::middleware('auth:api')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
+// Route::middleware('login')->apiResource('/BorrowLog', 'api\LogController'); 
 Route::post('/user/login', 'api\UserController@login');
 Route::middleware('login')->apiResource('/library', 'api\BookController');
 Route::middleware('login')->apiResource('/user', 'api\UserController');
-Route::middleware('login')->apiResource('/BorrowLog', 'api\LogController');
 Route::middleware('login')->post('/borrow', 'api\LogController@borrow');
 Route::middleware('login')->put('/returnBook', 'api\LogController@returnBook');
+Route::middleware('login')->get('/BorrowLog', 'api\LogController@index');
+Route::middleware('login')->get('/BorrowLog/user/{UserId}', 'api\LogController@UserBorrowLog');
+Route::middleware('login')->get('/BorrowLog/book/{BookId}', 'api\LogController@BookBorrowLog');

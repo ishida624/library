@@ -20,7 +20,7 @@ class LoginMiddleware
         #check token
         $token = $request->header('userToken');
         $data = User::where('remember_token', $token)->first();
-        $Lv = $data->Lv;
+        // $Lv = $data->Lv;
         $request->merge(['UserData' => $data]);
         // dd($Lv);
         // dd($data->remember_token);

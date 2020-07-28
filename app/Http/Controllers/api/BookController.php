@@ -10,6 +10,10 @@ use App\User;
 
 class BookController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('administrator')->except('index', 'show');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -18,7 +22,6 @@ class BookController extends Controller
     public function index()
     {
         $index = Book::all();
-
         return $index;
     }
 
@@ -33,17 +36,15 @@ class BookController extends Controller
     {
         // $token = $request->header('userToken');
         // $UserLv = User::where('remember_token', $token)->first()->Lv;
-        $UserData = $request->input('UserData');
-        $UserLv = $UserData->Lv;
-        if ($UserLv === 3) {
-            $bookname = $request->bookname;
-            // dd($bookname);
-            Book::create(['bookname' => $bookname, 'status' => true]);
-
-            return response()->json(['message' => 'create successfully'], 201);
-        } else {
-            return response()->json(['message' => 'Unauthorized', 'reason' => 'Permission denied'], 403);
-        }
+        // $UserData = $request->input('UserData');
+        // $UserLv = $UserData->Lv;
+        // if ($UserLv === 3) {
+        $bookname = $request->bookname;
+        Book::create(['bookname' => $bookname, 'status' => true]);
+        return response()->json(['message' => 'create successfully'], 201);
+        // } else {
+        //     return response()->json(['message' => 'Unauthorized', 'reason' => 'Permission denied'], 403);
+        // }
     }
 
     /**
@@ -56,7 +57,6 @@ class BookController extends Controller
     public function show($id)
     {
         $book = Book::find($id);
-
         return $book;
     }
 
@@ -72,16 +72,15 @@ class BookController extends Controller
     {
         // $token = $request->header('userToken');
         // $UserLv = User::where('remember_token', $token)->first()->Lv;
-        $UserData = $request->input('UserData');
-        $UserLv = $UserData->Lv;
-        if ($UserLv === 3) {
-            $update = $request->bookname;
-            Book::find($id)->update(['bookname' => $update]);
-
-            return response()->json(['message' => 'update successfully'], 200);
-        } else {
-            return response()->json(['message' => 'Unauthorized', 'reason' => 'Permission denied'], 403);
-        }
+        // $UserData = $request->input('UserData');
+        // $UserLv = $UserData->Lv;
+        // if ($UserLv === 3) {
+        $update = $request->bookname;
+        Book::find($id)->update(['bookname' => $update]);
+        return response()->json(['message' => 'update successfully'], 200);
+        // } else {
+        //     return response()->json(['message' => 'Unauthorized', 'reason' => 'Permission denied'], 403);
+        // }
     }
 
     /**
@@ -94,15 +93,14 @@ class BookController extends Controller
     public function destroy(Request $request, $id)
     {
         // $token = $request->header('userToken');
-        $UserData = $request->input('UserData');
-        $UserLv = $UserData->Lv;
+        // $UserData = $request->input('UserData');
+        // $UserLv = $UserData->Lv;
         // $UserLv = User::where('remember_token', $token)->first()->Lv;
-        if ($UserLv === 3) {
-            $delete = Book::find($id)->delete();
-
-            return response()->json(['message' => 'delete successfully'], 200);
-        } else {
-            return response()->json(['message' => 'Unauthorized', 'reason' => 'Permission denied'], 403);
-        }
+        // if ($UserLv === 3) {
+        $delete = Book::find($id)->delete();
+        return response()->json(['message' => 'delete successfully'], 200);
+        // } else {
+        //     return response()->json(['message' => 'Unauthorized', 'reason' => 'Permission denied'], 403);
+        // }
     }
 }
