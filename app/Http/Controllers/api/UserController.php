@@ -4,7 +4,9 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use App\Http\Requests\UserRequest;
+use App\Http\Requests\UpdateRequest;
+// use Illuminate\Http\Response;
 use App\User;
 use Illuminate\Support\Str;
 
@@ -43,22 +45,19 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+
+    public function store(UserRequest $request)
     {
-        // $token = $request->header('userToken');
-        // $UserLv = User::where('remember_token', $token)->first()->Lv;
-        // $UserData = $request->input('UserData');
-        // $UserLv = $UserData->Lv;
-        // if ($UserLv === 3) {
         $Lv = $request->Lv;
         $username = $request->username;
         $password = $request->password;
+        $SameUsername = User::where('name', $username)->first();
+        if (isset($SameUsername)) {
+            return response()->json(['message' => 'bad request', 'reason' => 'this name was used'], 403);
+        }
         $hash = password_hash($password, PASSWORD_DEFAULT);
         User::create(['name' => $username, 'password' => $hash, 'Lv' => $Lv, 'remember_token' => 'new user']);
         return response()->json(['message' => 'create succesfully'], 201);
-        // } else {
-        //     return response()->json(['message' => 'Unauthorized', 'reason' => 'Permission denied'], 403);
-        // }
     }
 
     /**
@@ -70,7 +69,11 @@ class UserController extends Controller
     public function show($id)
     {
         $user = User::find($id);
-        return $user;
+        if (isset($user)) {
+            return $user;
+        } else {
+            return response()->json(['message' => 'bad request', 'reason' => 'User id ls false'], 400);
+        }
     }
 
     /**
@@ -80,7 +83,7 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateRequest $request, $id)
     {
         // dd($request->username, $id);
         // $token = $request->header('userToken');
@@ -88,23 +91,25 @@ class UserController extends Controller
         // $UserData = $request->input('UserData');
         // $UserLv = $UserData->Lv;
         // if ($UserLv === 3) {
-        if (isset($request->username)) {
-            $username = $request->username;
-            $update = User::find($id)->update(['name' => $username]);
-        }
-        if (isset($request->password)) {
-            $password = $request->password;
-            $hash = password_hash($password, PASSWORD_DEFAULT);
-            $update = User::find($id)->update(['password' => $hash]);
-        }
-        if (isset($request->Lv)) {
-            $Lv = $request->Lv;
-            $update = User::find($id)->update(['Lv' => $Lv]);
+        $user = User::find($id);
+        if (isset($user)) {
+            if (isset($request->username)) {
+                $username = $request->username;
+                $user->update(['name' => $username]);
+            }
+            if (isset($request->password)) {
+                $password = $request->password;
+                $hash = password_hash($password, PASSWORD_DEFAULT);
+                $user->update(['password' => $hash]);
+            }
+            if (isset($request->Lv)) {
+                $Lv = $request->Lv;
+                $user->update(['Lv' => $Lv]);
+            }
+        } else {
+            return response()->json(['message' => 'bad request', 'reason' => 'User id ls false'], 400);
         }
         return response()->json(['message' => 'update successfully'], 200);
-        // } else {
-        //     return response()->json(['message' => 'Unauthorized', 'reason' => 'Permission denied'], 403);
-        // }
     }
 
     /**
@@ -115,16 +120,13 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        // $token = $request->header('userToken');
-        // $UserLv = User::where('remember_token', $token)->first()->Lv;
-        // $UserData = $request->input('UserData');
-        // $UserLv = $UserData->Lv;
-        // if ($UserLv === 3) {
-        User::find($id)->delete();
-        return response()->json(['message' => 'delete successfully'], 200);
-        // } else {
-        //     return response()->json(['message' => 'Unauthorized', 'reason' => 'Permission denied'], 403);
-        // }
+        $delete = User::find($id);
+        if (isset($delete)) {
+            $delete->delete();
+            return response()->json(['message' => 'delete successfully'], 200);
+        } else {
+            return response()->json(['message' => 'bad request', 'reason' => 'User id ls false'], 400);
+        }
     }
     public function login(Request $request)
     {
@@ -135,7 +137,7 @@ class UserController extends Controller
             // dd('hello');
             $dbPassword = $UserData->password;
             if (password_verify($password, $dbPassword)) {
-                do {                                #避免token重複
+                do {                                #隨機生成token，do while回圈避免token重複
                     // $token = rand(1, 3);
                     $token = Str::random(15);
                     $tokenCheck = User::where('remember_token', $token)->first();

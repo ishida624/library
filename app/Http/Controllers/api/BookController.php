@@ -4,9 +4,8 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Requests\BookRequest;
 use App\Book;
-// use App\BorrowLog;
-use App\User;
 
 class BookController extends Controller
 {
@@ -32,19 +31,11 @@ class BookController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(BookRequest $request)
     {
-        // $token = $request->header('userToken');
-        // $UserLv = User::where('remember_token', $token)->first()->Lv;
-        // $UserData = $request->input('UserData');
-        // $UserLv = $UserData->Lv;
-        // if ($UserLv === 3) {
         $bookname = $request->bookname;
         Book::create(['bookname' => $bookname, 'status' => true]);
         return response()->json(['message' => 'create successfully'], 201);
-        // } else {
-        //     return response()->json(['message' => 'Unauthorized', 'reason' => 'Permission denied'], 403);
-        // }
     }
 
     /**
@@ -56,8 +47,12 @@ class BookController extends Controller
      */
     public function show($id)
     {
-        $book = Book::find($id);
-        return $book;
+        $Book = Book::find($id);
+        if (isset($Book)) {
+            return $Book;
+        } else {
+            return response()->json(['message' => 'bad request', 'reason' => 'book id ls false'], 400);
+        }
     }
 
     /**
@@ -68,19 +63,16 @@ class BookController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(BookRequest $request, $id)
     {
-        // $token = $request->header('userToken');
-        // $UserLv = User::where('remember_token', $token)->first()->Lv;
-        // $UserData = $request->input('UserData');
-        // $UserLv = $UserData->Lv;
-        // if ($UserLv === 3) {
         $update = $request->bookname;
-        Book::find($id)->update(['bookname' => $update]);
-        return response()->json(['message' => 'update successfully'], 200);
-        // } else {
-        //     return response()->json(['message' => 'Unauthorized', 'reason' => 'Permission denied'], 403);
-        // }
+        $Book = Book::find($id);
+        if (isset($Book)) {
+            $Book->update(['bookname' => $update]);
+            return response()->json(['message' => 'update successfully'], 200);
+        } else {
+            return response()->json(['message' => 'bad request', 'reason' => 'book id ls false'], 400);
+        }
     }
 
     /**
@@ -90,15 +82,20 @@ class BookController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
         // $token = $request->header('userToken');
         // $UserData = $request->input('UserData');
         // $UserLv = $UserData->Lv;
         // $UserLv = User::where('remember_token', $token)->first()->Lv;
         // if ($UserLv === 3) {
-        $delete = Book::find($id)->delete();
-        return response()->json(['message' => 'delete successfully'], 200);
+        $Book = Book::find($id);
+        if (isset($Book)) {
+            $Book->delete();
+            return response()->json(['message' => 'delete successfully'], 200);
+        } else {
+            return response()->json(['message' => 'bad request', 'reason' => 'book id ls false'], 400);
+        }
         // } else {
         //     return response()->json(['message' => 'Unauthorized', 'reason' => 'Permission denied'], 403);
         // }

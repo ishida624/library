@@ -59,12 +59,20 @@ class LogController extends Controller
     public function UserBorrowLog($UserId)
     {
         $BorrowLog = User::find($UserId)->BorrowLog->sortbydesc('borrow_time');
-        return $BorrowLog;
+        if (isset($BorrowLog)) {
+            return $BorrowLog;
+        } else {
+            return response()->json(['message' => 'bad request', 'reason' => 'User id ls false'], 400);
+        }
     }
     public function BookBorrowLog($BookId)
     {
         $BorrowLog = Book::find($BookId)->BorrowLog->sortbydesc('borrow_time');
-        return $BorrowLog;
+        if (isset($BorrowLog)) {
+            return $BorrowLog;
+        } else {
+            return response()->json(['message' => 'bad request', 'reason' => 'Book id ls false'], 400);
+        }
     }
 
     /**
@@ -93,33 +101,36 @@ class LogController extends Controller
     {
         #book status : true  書還在  ，false 書被借
         #give back  :  true 已還書 ，false 書未還
-        // $token = $request->header('userToken');
-        // $UserData = User::where('remember_token', $token)->first();
         $UserData = $request->input('UserData');
         $Lv = $UserData->Lv;
         #若是管理者身份 可輸入UserId幫使用者借書
         if ($Lv == 3 && isset($request->UserId)) {
             $UserId = $request->UserId;
             $UserData = User::find($UserId);
+            if (!$UserData) {
+                return response()->json(['message' => 'bad request', 'reason' => 'User id ls false'], 400);
+            }
         }
         $BorrowTime = $UserData->BorrowLog->where('give_back', '0')->sortby('borrow_time')->first();
         $NoGiveBack = $UserData->BorrowLog->where('give_back', '0')->count();
-        // dd($BorrowTime);
         $UserId = $UserData->id;
         $Borrower = $UserData->name;
 
         $BookId = $request->BookId;
         $BookData = Book::where('id', $BookId)->first();
+        if (!$BookData) {
+            return response()->json(['message' => 'bad request', 'reason' => 'Book id ls false'], 400);
+        }
         $Bookname = $BookData->bookname;
         $BookStatus = $BookData->status;
         #Lv1可借3本，Lv2能借5本
-        // if ($NoGiveBack >= 3 && $Lv == 1) {
-        //     return response()->json(['message' => 'bad request', 'reason' => 'only borrow 3 books'], 400);
-        // }
+        if ($NoGiveBack >= 3 && $Lv == 1) {
+            return response()->json(['message' => 'bad request', 'reason' => 'only borrow 3 books'], 400);
+        }
         if ($NoGiveBack >= 5 && $Lv == 2) {
             return response()->json(['message' => 'bad request', 'reason' => 'only borrow 5 books'], 400);
         }
-        #Lv1可借一週，Lv2能借兩週
+        #Lv1可借一週，Lv2能借兩週，新書能借5天（新增的一個月內為新書）
         if (isset($BorrowTime->borrow_time)) {
             $BorrowTime = $BorrowTime->borrow_time;
             if ($Lv == 1) {
@@ -131,12 +142,11 @@ class LogController extends Controller
             if (date('Y-m-d H:i:s') < $BookData->created_at->addMonth()->toDateString()) {
                 $OutTime = date('Y-m-d H:i:s', strtotime('+5 day', strtotime($BorrowTime)));
             }
-        }
-        if ($OutTime < date('Y-m-d  H:i:s')) {
-            return response()->json(['message' => 'bad request', 'reason' => 'you have same book not give back over time'], 400);
+            if ($OutTime < date('Y-m-d  H:i:s')) {
+                return response()->json(['message' => 'bad request', 'reason' => 'you have same book not give back over time'], 400);
+            }
         }
 
-        // dd($Bookname);
         #判斷書有沒有被借走
         if (isset($BookData) && $BookStatus == 1) {
             BorrowLog::create(['user_id' => $UserId, 'bookname' => $Bookname, 'book_id' => $BookId, 'give_back' => false]);
