@@ -11,6 +11,6 @@ class BorrowLog extends Model
     public $primaryKey = 'id';
     public $timestamps = false;
     protected $fillable = [
-         'bookname', 'book_id','status','user_id','give_back','give_back_time'
+        'bookname', 'book_id', 'status', 'user_id', 'give_back', 'give_back_time'
     ];
 }

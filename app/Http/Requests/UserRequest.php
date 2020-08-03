@@ -34,13 +34,14 @@ class UserRequest extends FormRequest
     public function messages()
     {
         return [
-            'Lv.required' => 'Lv should between 1 to 3',
-            'Lv.integer' => 'Lv should between 1 to 3',
-            'Lv.between' => 'Lv should between 1 to 3',
-            'username.required' => 'username between 3 to 16 charactersand only 0-9,a-z,A-Z',
-            'username.regex' => 'username between 3 to 16 charactersand only 0-9,a-z,A-Z',
-            'password.required' => 'password should between 8 to 20 characters and only 0-9,a-z,A-Z',
-            'password.regex' => 'password should between 8 to 20 characters and only 0-9,a-z,A-Z ',
+            // 'Lv.required' => 'Lv should between 1 to 3',
+            // 'Lv.integer' => 'Lv should between 1 to 3',
+            // 'Lv.between' => 'Lv should between 1 to 3',
+            'Lv' => 'Lv should between 1 to 3',
+            'username' => 'username between 3 to 16 charactersand only 0-9,a-z,A-Z',
+            // 'username.regex' => 'username between 3 to 16 charactersand only 0-9,a-z,A-Z',
+            'password' => 'password should between 8 to 20 characters and only 0-9,a-z,A-Z',
+            // 'password.regex' => 'password should between 8 to 20 characters and only 0-9,a-z,A-Z ',
 
         ];
     }

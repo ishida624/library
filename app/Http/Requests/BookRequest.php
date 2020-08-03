@@ -32,8 +32,8 @@ class BookRequest extends FormRequest
     public function messages()
     {
         return [
-            'bookname.required' => 'item can not null.',
-            'bookname.max' => 'item can not over 60 characters'
+            'bookname' => 'bookname can not null and can not over 20 characters.',
+            // 'bookname.max' => 'bookname can not null and can not over 20 characters'
         ];
     }
     protected function failedValidation(Validator $validator)

@@ -53,7 +53,7 @@ class UserController extends Controller
         $password = $request->password;
         $SameUsername = User::where('name', $username)->first();
         if (isset($SameUsername)) {
-            return response()->json(['message' => 'bad request', 'reason' => 'this name was used'], 403);
+            return response()->json(['message' => 'bad request', 'reason' => 'this name already used'], 403);
         }
         $hash = password_hash($password, PASSWORD_DEFAULT);
         User::create(['name' => $username, 'password' => $hash, 'Lv' => $Lv, 'remember_token' => 'new user']);

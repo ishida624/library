@@ -58,8 +58,11 @@ class LogController extends Controller
     }
     public function UserBorrowLog($UserId)
     {
-        $BorrowLog = User::find($UserId)->BorrowLog->sortbydesc('borrow_time');
+        $BorrowLog = User::find($UserId);
         if (isset($BorrowLog)) {
+            // $BorrowLog->BorrowLog->sortbydesc('borrow_time');
+            $BorrowLog->BorrowLog->where('borrow_log')->flatten();
+            // dd($BorrowLog);
             return $BorrowLog;
         } else {
             return response()->json(['message' => 'bad request', 'reason' => 'User id ls false'], 400);
@@ -67,8 +70,9 @@ class LogController extends Controller
     }
     public function BookBorrowLog($BookId)
     {
-        $BorrowLog = Book::find($BookId)->BorrowLog->sortbydesc('borrow_time');
+        $BorrowLog = Book::find($BookId);
         if (isset($BorrowLog)) {
+            $BorrowLog->BorrowLog->sortbydesc('borrow_time');
             return $BorrowLog;
         } else {
             return response()->json(['message' => 'bad request', 'reason' => 'Book id ls false'], 400);
@@ -153,7 +157,7 @@ class LogController extends Controller
             $BookData->update(['Borrower' => $Borrower, 'status' => false]);
             return response()->json(['message' => 'borrow successfully'], 200);
         } else {
-            return response()->json(['message' => 'bad request', 'reason' => 'book not found or it is borrowed'], 400);
+            return response()->json(['message' => 'bad request', 'reason' => 'book not found or already borrowed'], 400);
         }
     }
     public function returnBook(Request $request)
@@ -167,11 +171,17 @@ class LogController extends Controller
             $UserId = $request->UserId;
             $UserData = User::find($UserId);
         }
+        if (!$UserData) {
+            return response()->json(['message' => 'bad request', 'reason' => 'User id false'], 400);
+        }
         $BookId = $request->BookId;
         $BorrowLog = $UserData->BorrowLog->where('book_id', $BookId)->sortbydesc('borrow_time')->first();
+        // dd($BorrowLog);
+        if (!$BorrowLog) {
+            return response()->json(['message' => 'bad request', 'reason' => 'book id false'], 400);
+        }
         $GiveBack = $BorrowLog->give_back;
-        // dd($BookData);
-        if (isset($BorrowLog) && $GiveBack == 0) {
+        if ($GiveBack == 0) {
             $BorrowLog->update(['give_back' => true, 'give_back_time' => date('Y-m-d H:i:s')]);
             Book::find($BookId)->update(['Borrower' => null, 'status' => true]);
             return response()->json(['message' => 'give back successfully'], 200);
